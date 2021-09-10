@@ -1,4 +1,4 @@
 name: guarded-0.1
 include: src
-depend:
+depend: cubical
 flags:
