@@ -112,4 +112,4 @@ module LemmaLift {l'} {A : Set l'} where
      aux : ∀ k → (m : ∀Lift A) → (∀ a → m ⇓∀ a → ∀ k → Q k a) → Lift^ k (out∀ m k) (Q k)
      aux k = fix {k = k} \ where
                r (now x) p → now (p x now k)
-               r (step x) p  → step \ α → bwd {m = x .uncon} (\ a d k → p a (step d) k) k
+               r (step x) p  → step \ α → r α (x .uncon) (\ a d k → p a (step d) k)
