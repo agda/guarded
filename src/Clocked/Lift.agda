@@ -82,10 +82,10 @@ data FLift (A : Set) : Set where
   now : A → FLift A
   step : FLift A → FLift A
 
-{-# TERMINATING #-}
 out∀ : ∀ {l} {A : Set l} → ∀Lift A → ∀ k → Lift k A
-out∀ (now a) k = now a
-out∀ (step x) k = step (\ α → out∀ (x .uncon) k)
+out∀ {l} {A} = \ a k → aux k a where
+  aux : ∀ k → ∀Lift A → Lift k A
+  aux k = fix (\ r → \ { (now a) →  now a; (step x) → step \ α → r α (x .uncon) })
 
 -- Assuming clock irrelevant A.
 postulate
@@ -102,7 +102,8 @@ data _⇓∀_ {l} {A : Set l} : (m : ∀Lift A) → A → Set l where
 
 module LemmaLift {l'} {A : Set l'} where
  fwd : ∀ {Q : Cl → A → Set l} {m : ∀Lift A} → (∀ k → Lift^ k (out∀ m k) (Q k)) → (∀ a → m ⇓∀ a → ∀ k → Q k a)
- fwd p a (step d) k = fwd (\ k → force (\ k → Lift-step (p k)) k) a d k
+ fwd {Q = Q} p a (step d) k = fwd (\ k →  force (\ k → \ α → subst (Lift^' k (Q k)) (pfix' _ α $> _)
+                                      (Lift-step (p k) α) ) k ) a d k
  fwd p a now k with p k
  ... | now x = x
 
@@ -112,4 +113,5 @@ module LemmaLift {l'} {A : Set l'} where
      aux : ∀ k → (m : ∀Lift A) → (∀ a → m ⇓∀ a → ∀ k → Q k a) → Lift^ k (out∀ m k) (Q k)
      aux k = fix {k = k} \ where
                r (now x) p → now (p x now k)
-               r (step x) p  → step \ α → r α (x .uncon) (\ a d k → p a (step d) k)
+               r (step x) p  → step \ α → subst (Lift^' k (Q k)) (sym (pfix' _ α $> _))
+                                                (r α (x .uncon) (\ a d k → p a (step d) k))
