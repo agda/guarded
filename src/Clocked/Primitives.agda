@@ -23,12 +23,9 @@ open Prims renaming (primLockUniv to LockU) public
 postulate
   Cl : Set
   k0 : Cl
-  STick : Cl → LockU
 
 postulate
   Tick : Cl → LockU
--- data  Tick (k  : Cl) : LockU where
---   con : (@tick α : STick k) → Tick k
 
 postulate
   FTick : Cl → LockU
@@ -36,9 +33,7 @@ postulate
   emb : ∀ {k} → Tick k → FTick k
 
 {-# BUILTIN CLOCK Cl #-}
--- {-# BUILTIN STRONGTICK STick #-}
 {-# BUILTIN TICK Tick #-}
--- {-# BUILTIN TICKCON con #-}
 {-# BUILTIN FORCINGTICK FTick #-}
 {-# BUILTIN EMBTICK emb #-}
 {-# BUILTIN DIAMONDTICK ◇ #-}
